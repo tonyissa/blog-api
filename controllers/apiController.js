@@ -4,7 +4,7 @@ const Blog = require('../models/Blog');
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 const jwt = require('jsonwebtoken');
-const serialize = require('cookie/serialize');
+const serialize = require('cookie').serialize;
 
 exports.index_get = asyncHandler(async (req, res, next) => {
     const posts = await Blog.find().exec();
