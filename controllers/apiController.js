@@ -17,8 +17,8 @@ exports.blog_get = asyncHandler(async (req, res, next) => {
 })
 
 exports.blog_post = [
-    body('title').trim().exists().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
-    body('comment').trim().exists().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
+    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
+    body('comment').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -37,8 +37,8 @@ exports.blog_post = [
 ]
 
 exports.blog_put = [
-    body('title').trim().exists().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
-    body('comment').trim().exists().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
+    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
+    body('comment').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -61,7 +61,7 @@ exports.blog_delete = asyncHandler(async (req, res, next) => {
 
 exports.comment_post = [
     body('username').trim().optional().isLength({ max: 15 }).withMessage(`Username can't exceed 15 characters`).escape(),
-    body('comment').trim().exists().withMessage('Comment required').isLength({ max: 1000 }).withMessage(`Comment can't exceed 1000 characters`).escape(),
+    body('comment').trim().notEmpty().withMessage('Comment required').isLength({ max: 1000 }).withMessage(`Comment can't exceed 1000 characters`).escape(),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -86,7 +86,7 @@ exports.comment_delete = asyncHandler(async (req, res, next) => {
 
 exports.login_post = asyncHandler(async (req, res, next) => {
     if (req.body.username !== process.env.ADMIN_USERNAME || req.body.password !== process.env.ADMIN_PASSWORD) {
-        res.json({ errors: [ "Username/password combo is not correct" ] });
+        res.json({ message: "Username/password combo is not correct" });
         return next();
     }
 
