@@ -2,20 +2,30 @@ var express = require('express');
 var router = express.Router();
 const api_controller = require('../controllers/apiController');
 
-/* GET users listing. */
+function verifyToken(req, res, next) {
+    const bearerAuth = req.headers['authorization'];
+    if (bearerAuth) {
+        const bearerToken = bearerAuth.split(' ')[1];
+        req.token = bearerToken;
+        next();
+    } else {
+        res.sendStatus(403);
+    }
+}
+
 router.get('/', api_controller.index_get);
 
-router.get('/blog/:id', api_controller.blog_get);
+router.get('/blog/:blogId', api_controller.blog_get);
 
-router.post('/blog', api_controller.blog_create);
+router.post('/blog', verifyToken, api_controller.blog_create);
 
-router.put('/blog/:id', api_controller.blog_edit);
+router.put('/blog/:blogId', verifyToken, api_controller.blog_edit);
 
-router.delete('/blog/:id', api_controller.blog_delete);
+router.delete('/blog/:blogId', verifyToken, api_controller.blog_delete);
 
-router.post('/blog/:id/comment', api_controller.comment_create);
+router.post('/blog/:blogId/comment', api_controller.comment_create);
 
-router.delete('/blog/:id/comment', api_controller.comment_delete);
+router.delete('/blog/:blogId/comment/:commentId', verifyToken, api_controller.comment_delete);
 
 router.post('/login', api_controller.login_post);
 

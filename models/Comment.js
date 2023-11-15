@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 const commentSchema = new Schema({
     username: { type: String },
     comment: { type: String },
-    date: { type: Date },
-    parent: { type: Schema.Types.ObjectId, ref: "Blog" }
+    blog: { type: Schema.Types.ObjectId, ref: "Blog" },
+    date: { type: Date }
 });
 
 module.exports = mongoose.model("Comment", commentSchema);
