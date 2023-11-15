@@ -17,7 +17,7 @@ router.get('/', api_controller.index_get);
 
 router.get('/blog/:blogId', api_controller.blog_get);
 
-router.post('/blog', verifyToken, api_controller.blog_post);
+router.post('/blog', api_controller.blog_post);
 
 router.put('/blog/:blogId', verifyToken, api_controller.blog_put);
 
