@@ -36,7 +36,7 @@ exports.blog_post = [
     })
 ]
 
-exports.blog_edit = [
+exports.blog_put = [
     body('title').trim().exists().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
     body('comment').trim().exists().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
     asyncHandler(async (req, res, next) => {
@@ -114,7 +114,7 @@ exports.login_post = asyncHandler(async (req, res, next) => {
 
 exports.logout_get = asyncHandler(async (req, res, next) => {
     const jwt = req.cookies.token;
-    
+
     if (!jwt) {
         return res.status(401).json({
             status: 'error',
@@ -129,7 +129,7 @@ exports.logout_get = asyncHandler(async (req, res, next) => {
         path: '/'
     });
     res.setHeader('Set-Cookie', serialized);
-    res.status(200).json({ //
+    res.status(200).json({
         status: 'success',
         message: 'Logged out',
     });

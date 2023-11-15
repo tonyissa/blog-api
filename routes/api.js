@@ -17,13 +17,13 @@ router.get('/', api_controller.index_get);
 
 router.get('/blog/:blogId', api_controller.blog_get);
 
-router.post('/blog', verifyToken, api_controller.blog_create);
+router.post('/blog', verifyToken, api_controller.blog_post);
 
-router.put('/blog/:blogId', verifyToken, api_controller.blog_edit);
+router.put('/blog/:blogId', verifyToken, api_controller.blog_put);
 
 router.delete('/blog/:blogId', verifyToken, api_controller.blog_delete);
 
-router.post('/blog/:blogId/comment', api_controller.comment_create);
+router.post('/blog/:blogId/comment', api_controller.comment_post);
 
 router.delete('/blog/:blogId/comment/:commentId', verifyToken, api_controller.comment_delete);
 
