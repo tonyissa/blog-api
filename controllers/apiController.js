@@ -6,15 +6,13 @@ const mongoose = require('mongoose');
 const { body, validationResult } = require("express-validator");
 
 exports.index_get = asyncHandler(async (req, res, next) => {
-
-})
-
-exports.about_get = asyncHandler(async (req, res, next) => {
-    
+    const posts = await Post.find().exec();
+    res.json(posts);
 })
 
 exports.blog_get = asyncHandler(async (req, res, next) => {
-    
+    const blog = await Post.findById(req.params.id).exec();
+    res.json(blog);
 })
 
 exports.blog_post = asyncHandler(async (req, res, next) => {
@@ -34,10 +32,6 @@ exports.comment_post = asyncHandler(async (req, res, next) => {
 })
 
 exports.comment_delete = asyncHandler(async (req, res, next) => {
-    
-})
-
-exports.login_get = asyncHandler(async (req, res, next) => {
     
 })
 
