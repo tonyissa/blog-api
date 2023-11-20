@@ -24,6 +24,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const cors = require('cors');
+
+app.use(cors({ credentials: true, origin: 'http://localhost:3002' }));
+
 app.use('/api', apiRouter);
 
 module.exports = app;

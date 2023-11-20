@@ -7,10 +7,9 @@ function verifyToken(req, res, next) {
     if (bearerAuth) {
         const bearerToken = bearerAuth.split(' ')[1];
         req.token = bearerToken;
-        next();
-    } else {
-        res.sendStatus(403);
+        return next();
     }
+    res.sendStatus(403);
 }
 
 router.get('/', api_controller.index_get);

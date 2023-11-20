@@ -18,7 +18,7 @@ exports.blog_get = asyncHandler(async (req, res, next) => {
 
 exports.blog_post = [
     body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
-    body('comment').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
+    body('blogBody').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -27,7 +27,7 @@ exports.blog_post = [
         }
         const newBlog = new Blog({
             title: req.body.title,
-            comment: req.body.comment,
+            blogBody: req.body.blogBody,
             date: new Date(),
             published: req.body.published
         })
@@ -96,18 +96,30 @@ exports.login_post = asyncHandler(async (req, res, next) => {
         password: process.env.ADMIN_PASSWORD
     }
 
-    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 * 60 }, (err, token) => {
+    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 }, (err, token) => {
+
         if (err) {
             return next(err)
         }
+
         const serialized = serialize('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60,
+            maxAge: 60,
             path: '/'
         });
-        res.setHeader('Set-Cookie', serialized);
+
+        const nonSensitiveCookie = serialize('nonSensitiveCookie', null, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60,
+            path: '/'
+        })
+
+        res.setHeader('Set-Cookie', [serialized, nonSensitiveCookie]);
+
         res.json({ token })
     })
 })

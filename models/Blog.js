@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const blogSchema = new Schema({
     title: { type: String },
-    comment: { type: String },
+    blogBody: { type: String },
     date: { type: Date },
     published: { type: Boolean }
 });
