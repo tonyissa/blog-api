@@ -42,15 +42,15 @@ exports.blog_put = [
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.json({ errors: errors.array() })
+            res.json({ errors: errors.array() });
             return next();
         }
         const updatedBlog = await Blog.findByIdAndUpdate(req.params.blogId, {
             title: req.body.title,
             comment: req.body.comment,
             published: req.body.published
-        })
-        res.json({ message: "Blog updated", updatedBlog })
+        });
+        res.json({ message: "Blog updated", updatedBlog });
     })
 ]
 
@@ -75,19 +75,18 @@ exports.comment_post = [
             date: new Date()
         })
         await newComment.save();
-        res.json({ message: "Message created", newComment })
+        res.json({ message: "Message created", newComment });
     })
 ]
 
 exports.comment_delete = asyncHandler(async (req, res, next) => {
     const deletedComment = await Comment.findByIdAndDelete(req.params.id).exec();
-    res.json({ messsage: 'Comment deleted', deletedComment })
+    res.json({ messsage: 'Comment deleted', deletedComment });
 })
 
 exports.login_post = asyncHandler(async (req, res, next) => {
     if (req.body.username !== process.env.ADMIN_USERNAME || req.body.password !== process.env.ADMIN_PASSWORD) {
-        res.json({ message: "Username/password combo is not correct" });
-        return next();
+        res.status(403).json({ message: "Username/password combo is not correct" });
     }
 
     const user = {
@@ -96,37 +95,24 @@ exports.login_post = asyncHandler(async (req, res, next) => {
         password: process.env.ADMIN_PASSWORD
     }
 
-    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 }, (err, token) => {
-
+    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 * 10 }, (err, token) => {
         if (err) {
-            return next(err)
+            return next(err);
         }
-
         const serialized = serialize('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60,
+            maxAge: 60 * 10,
             path: '/'
         });
-
-        const nonSensitiveCookie = serialize('nonSensitiveCookie', null, {
-            httpOnly: false,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 60,
-            path: '/'
-        })
-
-        res.setHeader('Set-Cookie', [serialized, nonSensitiveCookie]);
-
-        res.json({ token })
+        res.setHeader('Set-Cookie', serialized);
+        res.json({ token });
     })
 })
 
 exports.logout_get = asyncHandler(async (req, res, next) => {
     const jwt = req.cookies.token;
-
     if (!jwt) {
         return res.status(401).json({
             status: 'error',
@@ -146,3 +132,20 @@ exports.logout_get = asyncHandler(async (req, res, next) => {
         message: 'Logged out',
     });
 })
+
+exports.verify_token = function (req, res, next) {
+    const bearerToken = req.cookies.token;
+    if (bearerToken) {
+        jwt.verify(bearerToken, process.env.SEKRET_KEY, (err, authData) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
+            if (req.url === '/verify-user') {
+                return res.sendStatus(200);
+            }
+            next();
+        })
+    } else {
+        res.sendStatus(403);
+    }
+}
