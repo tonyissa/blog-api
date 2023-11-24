@@ -7,7 +7,12 @@ const jwt = require('jsonwebtoken');
 const serialize = require('cookie').serialize;
 
 exports.index_get = asyncHandler(async (req, res, next) => {
-    const posts = await Blog.find().exec();
+    const posts = await Blog.find({ published: true }, '-comment').exec();
+    res.json(posts);
+})
+
+exports.admin_index_get = asyncHandler(async (req, res, next) => {
+    const posts = await Blog.find({}, '-comment').exec();
     res.json(posts);
 })
 
@@ -17,13 +22,12 @@ exports.blog_get = asyncHandler(async (req, res, next) => {
 })
 
 exports.blog_post = [
-    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
+    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 100 }).withMessage(`Title can't exceed 100 characters`).escape(),
     body('blogBody').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.json({ errors: errors.array() })
-            return next();
+            return res.status(400).json({ errors: errors.array() })
         }
         const newBlog = new Blog({
             title: req.body.title,
@@ -32,7 +36,7 @@ exports.blog_post = [
             published: req.body.published
         })
         await newBlog.save();
-        res.json({ message: "Blog created", newBlog })
+        res.status(200).json({ message: "Blog created", newBlog })
     })
 ]
 
@@ -42,8 +46,7 @@ exports.blog_put = [
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.json({ errors: errors.array() });
-            return next();
+            return res.json({ errors: errors.array() });
         }
         const updatedBlog = await Blog.findByIdAndUpdate(req.params.blogId, {
             title: req.body.title,
@@ -65,8 +68,7 @@ exports.comment_post = [
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.json({ errors: errors.array() })
-            return next();
+            return res.json({ errors: errors.array() })
         }
         const newComment = new Comment({
             username: req.body.username,
@@ -88,14 +90,12 @@ exports.login_post = asyncHandler(async (req, res, next) => {
     if (req.body.username !== process.env.ADMIN_USERNAME || req.body.password !== process.env.ADMIN_PASSWORD) {
         res.status(403).json({ message: "Username/password combo is not correct" });
     }
-
     const user = {
         id: "him",
         username: process.env.ADMIN_USERNAME,
         password: process.env.ADMIN_PASSWORD
     }
-
-    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 * 10 }, (err, token) => {
+    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 * 60 }, (err, token) => {
         if (err) {
             return next(err);
         }
@@ -103,18 +103,17 @@ exports.login_post = asyncHandler(async (req, res, next) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 10,
+            maxAge: 60 * 60,
             path: '/'
         });
-        res.setHeader('Set-Cookie', serialized);
-        res.json({ token });
+        res.setHeader('Set-Cookie', serialized).send();
     })
 })
 
 exports.logout_get = asyncHandler(async (req, res, next) => {
     const jwt = req.cookies.token;
     if (!jwt) {
-        return res.status(401).json({
+        return res.status(403).json({
             status: 'error',
             error: 'Unauthorized',
         })
@@ -138,14 +137,14 @@ exports.verify_token = function (req, res, next) {
     if (bearerToken) {
         jwt.verify(bearerToken, process.env.SEKRET_KEY, (err, authData) => {
             if (err) {
-                return res.sendStatus(403);
+                return res.status(403).json({ status: 'error', message: err });
             }
             if (req.url === '/verify-user') {
-                return res.sendStatus(200);
+                return res.status(200).json({ status: 'success', message: 'User verified' });
             }
             next();
         })
     } else {
-        res.sendStatus(403);
+        res.status(403).json({ status: 'error', message: 'User is not logged in' });
     }
 }

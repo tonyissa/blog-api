@@ -4,6 +4,8 @@ const api_controller = require('../controllers/apiController');
 
 router.get('/', api_controller.index_get);
 
+router.get('/admin', api_controller.verify_token, api_controller.admin_index_get);
+
 router.get('/blog/:blogId', api_controller.blog_get);
 
 router.post('/blog', api_controller.verify_token, api_controller.blog_post);
