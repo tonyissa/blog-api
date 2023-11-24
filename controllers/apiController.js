@@ -22,8 +22,8 @@ exports.blog_get = asyncHandler(async (req, res, next) => {
 })
 
 exports.blog_post = [
-    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 100 }).withMessage(`Title can't exceed 100 characters`).escape(),
-    body('blogBody').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
+    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 100 }).withMessage(`Title can't exceed 100 characters`),
+    body('blogBody').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -41,8 +41,8 @@ exports.blog_post = [
 ]
 
 exports.blog_put = [
-    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`).escape(),
-    body('comment').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`).escape(),
+    body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`),
+    body('comment').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -63,8 +63,8 @@ exports.blog_delete = asyncHandler(async (req, res, next) => {
 })
 
 exports.comment_post = [
-    body('username').trim().optional().isLength({ max: 15 }).withMessage(`Username can't exceed 15 characters`).escape(),
-    body('comment').trim().notEmpty().withMessage('Comment required').isLength({ max: 1000 }).withMessage(`Comment can't exceed 1000 characters`).escape(),
+    body('username').trim().optional().isLength({ max: 15 }).withMessage(`Username can't exceed 15 characters`),
+    body('comment').trim().notEmpty().withMessage('Comment required').isLength({ max: 1000 }).withMessage(`Comment can't exceed 1000 characters`),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
