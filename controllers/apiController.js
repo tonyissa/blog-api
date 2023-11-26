@@ -18,7 +18,8 @@ exports.admin_index_get = asyncHandler(async (req, res, next) => {
 
 exports.blog_get = asyncHandler(async (req, res, next) => {
     const blog = await Blog.findById(req.params.blogId).exec();
-    res.json(blog);
+    const comments = await Comment.find({ blog: req.params.blogId }).exec();
+    res.json({ blog, comments });
 })
 
 exports.blog_post = [
@@ -36,7 +37,7 @@ exports.blog_post = [
             published: req.body.published
         })
         await newBlog.save();
-        res.status(200).json({ message: "Blog created", newBlog })
+        res.json({ message: "Blog created", newBlog })
     })
 ]
 
@@ -46,7 +47,7 @@ exports.blog_put = [
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.json({ errors: errors.array() });
+            return res.status(400).json({ errors: errors.array() });
         }
         const updatedBlog = await Blog.findByIdAndUpdate(req.params.blogId, {
             title: req.body.title,
@@ -59,7 +60,7 @@ exports.blog_put = [
 
 exports.blog_delete = asyncHandler(async (req, res, next) => {
     const deletedBlog = await Blog.findByIdAndDelete(req.params.blogId).exec();
-    res.json({ messsage: 'Blog deleted', deletedBlog });
+    res.status(400).json({ messsage: 'Blog deleted', deletedBlog });
 })
 
 exports.comment_post = [
@@ -68,7 +69,7 @@ exports.comment_post = [
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.json({ errors: errors.array() })
+            return res.status(400).json({ errors: errors.array() })
         }
         const newComment = new Comment({
             username: req.body.username,
@@ -126,7 +127,7 @@ exports.logout_get = asyncHandler(async (req, res, next) => {
         path: '/'
     });
     res.setHeader('Set-Cookie', serialized);
-    res.status(200).json({
+    res.json({
         status: 'success',
         message: 'Logged out',
     });
@@ -140,7 +141,7 @@ exports.verify_token = function (req, res, next) {
                 return res.status(403).json({ status: 'error', message: err });
             }
             if (req.url === '/verify-user') {
-                return res.status(200).json({ status: 'success', message: 'User verified' });
+                return res.json({ status: 'success', message: 'User verified' });
             }
             next();
         })
