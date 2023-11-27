@@ -101,13 +101,13 @@ exports.login_post = asyncHandler(async (req, res, next) => {
             return next(err);
         }
         const serialized = serialize('token', token, {
-            httpOnly: true,
+            httpOnly: process.env.NODE_ENV === 'production',
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 60 * 120,
             path: '/'
         });
-        res.setHeader('Set-Cookie', serialized).send();
+        res.setHeader('Set-Cookie', serialized).json({ msg: "Cookie set" });
     })
 })
 
