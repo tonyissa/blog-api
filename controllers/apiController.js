@@ -43,7 +43,7 @@ exports.blog_post = [
 
 exports.blog_put = [
     body('title').trim().notEmpty().withMessage('Blog Post needs a title').isLength({ max: 110 }).withMessage(`Title can't exceed 110 characters`),
-    body('comment').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`),
+    body('blogBody').trim().notEmpty().withMessage('Blog Post needs a body').isLength({ max: 5000 }).withMessage(`Body can't exceed 5000 characters`),
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -51,7 +51,7 @@ exports.blog_put = [
         }
         const updatedBlog = await Blog.findByIdAndUpdate(req.params.blogId, {
             title: req.body.title,
-            comment: req.body.comment,
+            blogBody: req.body.blogBody,
             published: req.body.published
         });
         res.json({ message: "Blog updated", updatedBlog });
@@ -83,7 +83,7 @@ exports.comment_post = [
 ]
 
 exports.comment_delete = asyncHandler(async (req, res, next) => {
-    const deletedComment = await Comment.findByIdAndDelete(req.params.id).exec();
+    const deletedComment = await Comment.findByIdAndDelete(req.params.commentId).exec();
     res.json({ messsage: 'Comment deleted', deletedComment });
 })
 
@@ -96,7 +96,7 @@ exports.login_post = asyncHandler(async (req, res, next) => {
         username: process.env.ADMIN_USERNAME,
         password: process.env.ADMIN_PASSWORD
     }
-    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 * 60 }, (err, token) => {
+    jwt.sign({ user }, process.env.SEKRET_KEY, { expiresIn: 60 * 120 }, (err, token) => {
         if (err) {
             return next(err);
         }
@@ -104,7 +104,7 @@ exports.login_post = asyncHandler(async (req, res, next) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60,
+            maxAge: 60 * 120,
             path: '/'
         });
         res.setHeader('Set-Cookie', serialized).send();
