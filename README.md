@@ -1,2 +1,2 @@
-# blog-client
-Odin Project blog backend
+# blog-api
+Odin Project blog backend API
