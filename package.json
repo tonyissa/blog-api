@@ -19,5 +19,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
     "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.4.11"
   }
 }

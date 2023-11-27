@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const cors = require('cors');
 
-app.use(cors({ credentials: true, origin: 'http://localhost:3001' }));
+app.use(cors({ credentials: true, origin: 'https://antwonthedamaja.github.io/odin-blog-and-portfolio/' }));
 
 app.use('/api', apiRouter);
 
