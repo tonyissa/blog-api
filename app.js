@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const cors = require('cors');
 
-app.use(cors({ credentials: true, origin: 'https://antwonthedamaja.github.io' }));
+app.use(cors({ credentials: true, origin: 'https://tonyissa.github.io' }));
 
 app.use('/api', apiRouter);
 
